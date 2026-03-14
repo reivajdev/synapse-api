@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    // --- Configuración de Archivos ---
+    "rootDir": "./src",
+    "outDir": "./dist",
+    // --- Entorno (AQUÍ ESTABA EL ERROR) ---
+    "module": "nodenext",
+    "target": "esnext",
+    "moduleResolution": "nodenext", // Asegúrate de que esto esté presente
+    "lib": ["esnext"],
+    "types": ["node"], // <--- ACTIVADO: Ahora TS reconocerá node:url y node:fs
+
+    // --- Salidas ---
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+
+    // --- Chequeos Estrictos (Muy bien!) ---
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "strict": true,
+
+    // --- Opciones Recomendadas ---
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "noUncheckedSideEffectImports": true,
+    "moduleDetection": "force",
+    "skipLibCheck": true,
+    "esModuleInterop": true, // Añade esto para que js-yaml cargue sin problemas
+    "noEmit": false
+  },
+  "include": ["src/**/*"]
+}
