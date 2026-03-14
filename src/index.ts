@@ -25,7 +25,7 @@ async function bootstrap() {
             const finalPrefix = apiPrefix.startsWith('/') ? apiPrefix : `/${apiPrefix}`;
 
             console.log(`[Synapse] Registrando versión ${config.apiVersion} en: http://${CONFIG.server.host}:${CONFIG.server.port}${finalPrefix}`);
-            console.log(config)
+            
             // Registramos el grupo en Fastify
             await fastify.register(async (instance) => {
                 await RouterBuilder.build(instance, config);

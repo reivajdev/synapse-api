@@ -26,7 +26,7 @@
 
 ### 1. Requisitos previos
 
-* Node.js >= 18
+* Node.js >= 24.14.0
 * pnpm instalado (`npm install -g pnpm`)
 
 ### 2. Clonar e instalar

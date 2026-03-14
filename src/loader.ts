@@ -27,12 +27,9 @@ export function loadSynapseConfig(): SynapseGroupedConfig {
                     const content = fs.readFileSync(fullPath, 'utf8');
 
                     const replacedYaml = content.replace(/\${(\w+)}/g, (match, key) => {
-                        console.log(key)
                         return process.env[key] || match; // Si no existe en .env, deja el texto original
                     });
                     const parsed = yaml.load(replacedYaml) as SynapseConfigFile;
-                    console.log(parsed)
-
 
                     if (parsed && parsed.apiVersion) {
                         const version = parsed.apiVersion;
