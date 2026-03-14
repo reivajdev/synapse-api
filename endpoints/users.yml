@@ -1,0 +1,40 @@
+apiVersion: v1
+prefix: 'synapse-api/{apiVersion:}'
+
+#Pendiente de definir
+permissions:
+
+# Definimos las bases de datos que queramos usar
+# Tipo de base de datos, y parametros de conexión
+# las variables la tenemos que poner en el .env
+databases:
+  users_db: 
+    type: "postgres"
+    server: "${DB_PG_SERVER}"
+    database: "${DB_PG_DATABASE}"
+    port: "${DB_PG_PORT}"
+    user: "${DB_PG_USER}"
+    pass: "${DB_PG_PASS}"
+
+#Definimos los endpoints, donde se va a publicar, descripción, base de datos que vamos a usar, el esquema y los metodos
+endpoints:
+  - endpoint: "users"
+    description: "Gestión de usuarios del sistema"
+    use_db: "users_db" 
+    main_table: "tester.users" 
+    query_table: "tester.users" 
+    
+    # IMPLEMENTAR Definimos el esquema que queremos se puede poner all para todos los campos 
+    schema:
+      id: "int"
+      username: "string"
+      email: "email"
+      active: "bool"
+      created_at: "datetime"
+
+    # Definimos las metodos http con los permisos.
+    methods:
+      get:
+        filters: ["id", "username", "active"] # Aquí el "all" es opcional
+      post:
+        required: ["username", "email"] # Campos obligatorios para crear
