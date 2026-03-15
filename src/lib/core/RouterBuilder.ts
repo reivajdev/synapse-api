@@ -1,5 +1,7 @@
 import { GetStrategy } from './strategies/GetStrategy.js';
 import { PostStrategy } from './strategies/PostStrategy.js';
+import { PutStrategy } from './strategies/PutStrategy.js'; 
+import { DeleteStrategy } from './strategies/DeleteStrategy.js';
 import { type RouteStrategy } from './strategies/RouteStrategy.js';
 import { ConnectorFactory } from '../database/ConnectorFactory.js';
 import type { SynapseConfigFile } from '../../interfaces/ISynapse.js';
@@ -11,35 +13,43 @@ export class RouterBuilder {
     
     private static strategies: Record<string, RouteStrategy> = {
         'GET': new GetStrategy(),
-        'POST': new PostStrategy()
+        'POST': new PostStrategy(),
+        'PUT': new PutStrategy(),
+        'DELETE': new DeleteStrategy()
     };
 
-    /*
-     * Construye las rutas para una configuración específica
-     */
     static async build(fastify: any, config: SynapseConfigFile) {
         const { databases, endpoints } = config;
 
-        // Validamos que existan endpoints
         if (!endpoints || !Array.isArray(endpoints)) return;
 
         for (const ep of endpoints) {
-            for (const [methodName, settings] of Object.entries(ep.methods)) {
-                const httpMethod = methodName.toUpperCase();
+            for (const [keyName, settings] of Object.entries(ep.methods)) {
+                const methodFromSettings = (settings as any).method;
+                const httpMethod = (methodFromSettings || keyName).toUpperCase();
+                
                 const strategy = this.strategies[httpMethod];
 
-                if (!strategy) continue;
+                if (!strategy) {
+                    console.warn(`No se encontró estrategia para el método: ${httpMethod}`);
+                    continue;
+                }
 
-                // Registramos la ruta en la instancia de fastify
+                let url = `/${ep.endpoint}`;
+    
+                // Usamos with_id del YAML
+                const needsId = ['PUT', 'DELETE'].includes(httpMethod) || (settings as any).with_id === true;
+
+                if (needsId) {
+                    url += '/:id';
+                }
+
                 fastify.route({
                     method: httpMethod,
-                    url: `/${ep.endpoint}`,
+                    url: url,
                     handler: async (request: any, reply: any) => {
-                        const db = await ConnectorFactory.getConnector(
-                            ep.use_db, 
-                            databases[ep.use_db]
-                        );
-                        return strategy.handle(request, reply, db, ep, settings);
+                        const dbConnector = await ConnectorFactory.getConnector(ep.use_db, databases[ep.use_db]);
+                        return strategy.handle(request, reply, dbConnector, ep, settings);
                     }
                 });
             }

@@ -1,0 +1,35 @@
+server:
+  port: 3000
+  host: '0.0.0.0'           # Necesario para Docker/Kubernetes
+  trustProxy: true          # Confía en cabeceras de proxies (Nginx/Cloudflare)
+  connectionTimeout: 30000   # 30s: evita conexiones muertas
+  keepAliveTimeout: 5000     # 5s: equilibrio entre reuso de conexión y liberación
+  bodyLimit: 1048576        # 1MB Ajustar si se suben archivos
+  caseSensitive: false      # Mejora la experiencia del usuario con las URLs
+  http2: false              # Mejor dejarlo en false si el SSL lo termina un Proxy (Nginx)
+  ignoreTrailingSlash: true # Evita duplicidad de contenido y errores 404 tontos
+
+  #https:
+  #  key_path: './certs/server.key'
+  #  cert_path: './certs/server.cert'
+  #allowHTTP1: true       # Para que clientes viejos sigan funcionando
+  
+  logger:
+    level: 'info'           # En prod usar 'warn' o 'error'
+    redact:                 # No guarda datos sensibles en logs
+      - 'req.headers.authorization'
+      - 'req.body.password'
+      - 'req.body.creditCard'
+
+  ajv:
+    customOptions:
+      removeAdditional: true # Borra campos del body que no estén en tu esquema
+      useDefaults: true      # Rellena campos faltantes con valores por defecto del esquema
+      coerceTypes: true      # Convierte string a numeros
+
+  security:
+    xss: true
+    contentSecurityPolicy: true
+    rateLimit:
+      max: 100               # Máximo 100 peticiones por minuto
+      timeWindow: '1 minute'

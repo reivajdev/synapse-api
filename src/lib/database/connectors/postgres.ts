@@ -1,12 +1,16 @@
 /*
     Esta clase proporciona el conector específico de postgres
-    extiende de BaseConnector para asegurarnos que se implementan los metodos.
+    extiende de BaseConnector e integra Kysely.
 */
 import { BaseConnector } from '../BaseConnector.js';
+import { KyselyQueryBuilder } from '../builders/KyselyQueryBuilder.js';
+import { Kysely, PostgresDialect } from 'kysely';
 
 export class Connector extends BaseConnector {
     async connect() {
         const { default: pg } = await import('pg');
+        
+        // Creamos el pool de conexiones
         this.pool = new pg.Pool({
             host: this.config.server,
             database: this.config.database,
@@ -14,9 +18,17 @@ export class Connector extends BaseConnector {
             password: this.config.pass,
             port: this.config.port
         });
+
+        // Inicializamos Kysely
+        this.db = new Kysely<any>({
+            dialect: new PostgresDialect({
+                pool: this.pool
+            })
+        });
+
         const client = await this.pool.connect();
         client.release();
-        console.log(`Conector Postgres acoplado: ${this.config.database}`);
+        console.log(`Conector Postgres acoplado con Kysely: ${this.config.database}`);
     }
 
     async execute(query: string, params: any[] = []) {
@@ -25,7 +37,7 @@ export class Connector extends BaseConnector {
     }
 
     async disconnect() {
-        await this.pool.end();
+        await this.db.destroy(); 
     }
     
     async getTableMetadata(tableName: string): Promise<any[]> {
@@ -41,5 +53,10 @@ export class Connector extends BaseConnector {
         `;
         
         return await this.execute(query, [table, schema]);
+    }
+
+    // Implementamos el Builder
+    getQueryBuilder(): KyselyQueryBuilder {
+        return new KyselyQueryBuilder(this.db);
     }
 }

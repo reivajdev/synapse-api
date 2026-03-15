@@ -1,29 +1,48 @@
 /*
-    Generamos la estrategia GET
+    Soporta tanto listas como búsqueda por ID único.
 */
 import { type RouteStrategy } from './RouteStrategy.js';
 import { ResponseHandler } from '../ResponseHandler.js';
 
 export class GetStrategy implements RouteStrategy {
-    async handle(request: any, reply: any, db: any, ep: any, settings: any) {
-        const queryParams = request.query;
-        
-        // Lógica de filtros que ya tenías...
-        let sql = `SELECT * FROM ${ep.query_table}`;
-        const values: any[] = [];
-        const whereClauses: string[] = [];
+    async handle(request: any, reply: any, dbConnector: any, ep: any, settings: any) {
+        const queryParams = request.query; // Importante definir esto
+        const id = request.params.id;
+        const filters: Record<string, any> = {};
 
-        if (settings.filters) {
+        if (id) {
+            // Si hay ID en la URL, el único filtro es el ID
+            filters['id'] = id;
+        } else if (settings.filters) {
+            // Si no hay ID, procesamos los filtros del YAML y QueryParams
             for (const f of settings.filters) {
                 if (f !== 'all' && queryParams[f] !== undefined) {
-                    values.push(queryParams[f]);
-                    whereClauses.push(`${f} = $${values.length}`);
+                    filters[f] = queryParams[f];
                 }
             }
-            if (whereClauses.length > 0) sql += ` WHERE ${whereClauses.join(' AND ')}`;
         }
 
-        const rows = await db.execute(sql, values);
-        return reply.send(ResponseHandler.success(rows));
+        // Obtenemos el builder del conector
+        const qb = dbConnector.getQueryBuilder();
+
+        try {
+            // Consultamos la base de datos
+            const rows = await qb.select(ep.query_table, filters);
+            
+            // Manejo de respuesta detallado
+            if (id) {
+                if (rows.length === 0) {
+                    return reply.status(404).send(ResponseHandler.error('Resource not found', null));
+                }
+                // Si es por ID, devolvemos solo el objeto, no un array de un solo elemento
+                return reply.send(ResponseHandler.success(rows[0]));
+            }
+
+            // Si es lista, devolvemos el array completo
+            return reply.send(ResponseHandler.success(rows));
+
+        } catch (error: any) {
+            return reply.status(500).send(ResponseHandler.error('Database error', error.message));
+        }
     }
 }

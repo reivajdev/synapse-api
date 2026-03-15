@@ -1,5 +1,5 @@
 /*
-    Generamos una estrategia para la logica de los metodos HTTP (GET, POST, PUT, PATCH, DELETE).
+    Generamos una estrategia para la logica de los metodos HTTP (GET, POST, PUT, DELETE).
 */
 import { type FastifyRequest, type FastifyReply } from 'fastify';
 import { BaseConnector } from '../../database/BaseConnector.js';

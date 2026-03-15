@@ -38,3 +38,7 @@ endpoints:
         filters: ["id", "username", "active"] # Aquí el "all" es opcional
       post:
         required: ["username", "email"] # Campos obligatorios para crear
+      # Añadimos otro GET pero para un solo ID
+      get_detail: 
+        method: get 
+        with_id: true        

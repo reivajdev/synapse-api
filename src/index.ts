@@ -33,6 +33,7 @@ async function bootstrap() {
         }
 
         // Arrancamos con bind y port de la configuración
+        // Falta leer el server.yml
         await fastify.listen({ 
             port: CONFIG.server.port, 
             host: CONFIG.server.bind 
