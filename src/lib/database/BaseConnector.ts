@@ -10,7 +10,6 @@ export abstract class BaseConnector {
     constructor(config: any) {
         this.config = config;
     }
-
     /*
         Todos los conectores tiene que implementar estos metodos, para que se puedan ejectuar querys, 
         obtener los esquemas y gestionar las conexiones

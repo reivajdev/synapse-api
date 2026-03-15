@@ -2,11 +2,11 @@
     Función que se encarga de cargar el fichero de configuracion 
     y asignarlo a la interfaz corespondiente.
 */
-import { CONFIG } from './config/config.js'; // Verifica que la ruta sea esta
+import { CONFIG } from './config/Config.js'; // Verifica que la ruta sea esta
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as yaml from 'js-yaml';
-import type { SynapseConfigFile, SynapseGroupedConfig } from './interfaces/synapse.js';
+import type { SynapseConfigFile, SynapseGroupedConfig } from './interfaces/ISynapse.js';
 
 export function loadSynapseConfig(): SynapseGroupedConfig {
     const endpointsDir = CONFIG.paths.endpoints; // Aquí es donde fallaba

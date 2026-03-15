@@ -2,7 +2,7 @@ import { GetStrategy } from './strategies/GetStrategy.js';
 import { PostStrategy } from './strategies/PostStrategy.js';
 import { type RouteStrategy } from './strategies/RouteStrategy.js';
 import { ConnectorFactory } from '../database/ConnectorFactory.js';
-import type { SynapseConfigFile } from '../../interfaces/synapse.js';
+import type { SynapseConfigFile } from '../../interfaces/ISynapse.js';
 
 /*
     Clase que construye las rutas a partir de la configuración y aplica las estrategias

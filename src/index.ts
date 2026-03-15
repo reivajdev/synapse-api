@@ -1,9 +1,9 @@
 // src/index.ts
 import Fastify from 'fastify';
 import { loadSynapseConfig } from './loader.js';
-import { CONFIG } from './config/config.js'; //
+import { CONFIG } from './config/Config.js'; //
 import { RouterBuilder } from './lib/core/RouterBuilder.js';
-import type { SynapseConfigFile } from './interfaces/synapse.js';
+import type { SynapseConfigFile } from './interfaces/ISynapse.js';
 
 const fastify = Fastify({ logger: true });
 
